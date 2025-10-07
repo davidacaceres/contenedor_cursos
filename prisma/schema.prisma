@@ -1,0 +1,191 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/plataforma_cursos_online/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  INSTRUCTOR
+  STUDENT
+}
+
+enum LessonType {
+  VIDEO
+  PDF
+  TEXT
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id              String         @id @default(cuid())
+  name            String?
+  email           String         @unique
+  password        String?
+  emailVerified   DateTime?
+  image           String?
+  role            UserRole       @default(STUDENT)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  accounts        Account[]
+  sessions        Session[]
+  coursesCreated  Course[]       @relation("CourseInstructor")
+  enrollments     Enrollment[]
+  progress        Progress[]
+  quizResults     QuizResult[]
+}
+
+model Course {
+  id           String       @id @default(cuid())
+  title        String
+  description  String       @db.Text
+  thumbnail    String?
+  instructorId String
+  isPublished  Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  instructor   User         @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+  
+  @@index([instructorId])
+}
+
+model Lesson {
+  id          String      @id @default(cuid())
+  title       String
+  content     String?     @db.Text
+  type        LessonType
+  videoUrl    String?
+  pdfUrl      String?
+  courseId    String
+  order       Int
+  duration    Int?        // Duration in minutes
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quizzes     Quiz[]
+  progress    Progress[]
+  
+  @@index([courseId])
+  @@unique([courseId, order])
+}
+
+model Quiz {
+  id        String     @id @default(cuid())
+  title     String
+  lessonId  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  lesson    Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions Question[]
+  results   QuizResult[]
+  
+  @@index([lessonId])
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  text          String   @db.Text
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String   // A, B, C, or D
+  quizId        String
+  order         Int
+  createdAt     DateTime @default(now())
+  
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  
+  @@index([quizId])
+  @@unique([quizId, order])
+}
+
+model Enrollment {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  enrolledAt  DateTime @default(now())
+  completedAt DateTime?
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model Progress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+}
+
+model QuizResult {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  score       Int      // Percentage score (0-100)
+  answers     Json     // Store user answers as JSON
+  completedAt DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([quizId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
