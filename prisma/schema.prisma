@@ -18,6 +18,9 @@ enum LessonType {
   VIDEO
   PDF
   TEXT
+  DOCUMENT
+  EXTERNAL_LINK
+  QUIZ
 }
 
 model Account {
@@ -64,23 +67,46 @@ model User {
   enrollments     Enrollment[]
   progress        Progress[]
   quizResults     QuizResult[]
+  certificates    Certificate[]
+  submissions     Submission[]
+  comments        Comment[]
+  notifications   Notification[]
 }
 
 model Course {
-  id           String       @id @default(cuid())
+  id           String        @id @default(cuid())
   title        String
-  description  String       @db.Text
+  description  String        @db.Text
   thumbnail    String?
   instructorId String
-  isPublished  Boolean      @default(true)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  isPublished  Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   
-  instructor   User         @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  instructor   User          @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  modules      Module[]
   lessons      Lesson[]
   enrollments  Enrollment[]
+  certificates Certificate[]
+  assignments  Assignment[]
   
   @@index([instructorId])
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  courseId    String
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  
+  @@index([courseId])
+  @@unique([courseId, order])
 }
 
 model Lesson {
@@ -90,30 +116,39 @@ model Lesson {
   type        LessonType
   videoUrl    String?
   pdfUrl      String?
+  externalUrl String?
   courseId    String
+  moduleId    String?
   order       Int
   duration    Int?        // Duration in minutes
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   
   course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module      Module?     @relation(fields: [moduleId], references: [id], onDelete: SetNull)
   quizzes     Quiz[]
   progress    Progress[]
+  assignments Assignment[]
   
   @@index([courseId])
+  @@index([moduleId])
   @@unique([courseId, order])
 }
 
 model Quiz {
-  id        String     @id @default(cuid())
-  title     String
-  lessonId  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  lessonId    String
+  timeLimit   Int?         // Time limit in minutes (null = no limit)
+  maxAttempts Int?         // Maximum attempts allowed (null = unlimited)
+  passingScore Int         @default(70) // Percentage needed to pass
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   
-  lesson    Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  questions Question[]
-  results   QuizResult[]
+  lesson      Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  results     QuizResult[]
   
   @@index([lessonId])
 }
@@ -180,6 +215,139 @@ model QuizResult {
   
   @@index([userId])
   @@index([quizId])
+}
+
+model Certificate {
+  id              String   @id @default(cuid())
+  certificateCode String   @unique
+  userId          String
+  courseId        String
+  issuedAt        DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([certificateCode])
+}
+
+enum AssignmentType {
+  HOMEWORK
+  EXAM
+  PROJECT
+  ESSAY
+  MULTIPLE_CHOICE
+}
+
+model Assignment {
+  id            String         @id @default(cuid())
+  title         String
+  description   String         @db.Text
+  type          AssignmentType @default(HOMEWORK)
+  courseId      String
+  lessonId      String?
+  maxScore      Int            @default(100)
+  dueDate       DateTime?
+  isAutoGraded  Boolean        @default(false)
+  questionsData Json?          // Para preguntas de opción múltiple
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  course        Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson        Lesson?        @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  submissions   Submission[]
+  rubrics       Rubric[]
+  
+  @@index([courseId])
+  @@index([lessonId])
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  GRADED
+}
+
+model Submission {
+  id                 String           @id @default(cuid())
+  assignmentId       String
+  userId             String
+  content            String?          @db.Text
+  cloud_storage_path String?          // S3 key para archivos adjuntos
+  answersData        Json?            // Para respuestas de opción múltiple
+  status             SubmissionStatus @default(PENDING)
+  score              Int?
+  feedback           String?          @db.Text
+  submittedAt        DateTime?
+  gradedAt           DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  
+  assignment         Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments           Comment[]
+  
+  @@unique([assignmentId, userId])
+  @@index([assignmentId])
+  @@index([userId])
+  @@index([status])
+}
+
+model Rubric {
+  id           String   @id @default(cuid())
+  assignmentId String
+  criteriaData Json     // Array de criterios con nombre, descripción, puntos
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  
+  @@index([assignmentId])
+}
+
+model Comment {
+  id           String   @id @default(cuid())
+  submissionId String
+  userId       String
+  content      String   @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([submissionId])
+  @@index([userId])
+}
+
+enum NotificationType {
+  ASSIGNMENT_CREATED
+  SUBMISSION_GRADED
+  COMMENT_ADDED
+  COURSE_COMPLETED
+  NEW_ENROLLMENT
+  QUIZ_GRADED
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  isRead    Boolean          @default(false)
+  relatedId String?          // ID del curso, assignment, etc.
+  link      String?          // URL a donde redirigir
+  createdAt DateTime         @default(now())
+  
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
 }
 
 model VerificationToken {
