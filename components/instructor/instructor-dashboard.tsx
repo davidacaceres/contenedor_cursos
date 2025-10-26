@@ -193,6 +193,18 @@ export function InstructorDashboard({ instructor }: InstructorDashboardProps) {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
+                              <Link href={`/instructor/courses/${course.id}/content`}>
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                Gestionar contenido
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/instructor/courses/${course.id}/assignments`}>
+                                <FileText className="h-4 w-4 mr-2" />
+                                Gestionar tareas
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
                               <Link href={`/instructor/courses/${course.id}/students`}>
                                 <Users className="h-4 w-4 mr-2" />
                                 Ver estudiantes

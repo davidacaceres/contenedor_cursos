@@ -17,7 +17,8 @@ import {
   User,
   CheckCircle,
   Search,
-  Calendar
+  Calendar,
+  FileText
 } from 'lucide-react';
 
 interface StudentDashboardProps {
@@ -196,7 +197,7 @@ export function StudentDashboard({ student }: StudentDashboardProps) {
                       </div>
                       <div className="ml-4">
                         <Button asChild size="sm">
-                          <Link href={`/student/courses/${enrollment.course.id}`}>
+                          <Link href={`/student/courses/${enrollment.course.id}/content`}>
                             {enrollment.progressPercentage === 0 ? 'Comenzar' : 'Continuar'}
                             <Play className="h-4 w-4 ml-2" />
                           </Link>
@@ -296,6 +297,12 @@ export function StudentDashboard({ student }: StudentDashboardProps) {
                   <Link href="/student/courses">
                     <Search className="h-4 w-4 mr-2" />
                     Explorar Cursos
+                  </Link>
+                </Button>
+                <Button className="w-full justify-start" variant="outline" asChild>
+                  <Link href="/student/assignments">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Mis Tareas
                   </Link>
                 </Button>
                 <Button className="w-full justify-start" variant="outline" asChild>
