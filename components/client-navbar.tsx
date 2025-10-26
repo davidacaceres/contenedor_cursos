@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { BookOpen, User, LogOut, Menu, X, GraduationCap } from 'lucide-react';
+import { NotificationsDropdown } from '@/components/notifications-dropdown';
 
 export function ClientNavbar() {
   const { data: session, status } = useSession();
@@ -73,6 +74,9 @@ export function ClientNavbar() {
                     </Button>
                   )}
                 </div>
+
+                {/* Notificaciones */}
+                <NotificationsDropdown />
 
                 {/* User Menu */}
                 <DropdownMenu>
