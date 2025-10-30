@@ -3,6 +3,41 @@
 
 Esta guía te ayudará a instalar y configurar la Plataforma de Cursos Online en tu propio servidor.
 
+## 🚀 Instalación Rápida con Scripts Automáticos
+
+Para una instalación rápida y sin complicaciones, usa los scripts de instalación automática incluidos:
+
+### Linux Ubuntu/Debian
+```bash
+cd plataforma_cursos_online/nextjs_space
+chmod +x install-ubuntu.sh
+./install-ubuntu.sh
+```
+
+El script realizará automáticamente:
+- ✅ Instalación de Node.js, Yarn, PostgreSQL
+- ✅ Configuración de la base de datos
+- ✅ Instalación de dependencias del proyecto
+- ✅ Configuración de variables de entorno
+- ✅ Migraciones de base de datos
+- ✅ Compilación de la aplicación
+- ✅ Configuración de PM2 para gestión de procesos
+- ✅ Configuración de backups automáticos (opcional)
+
+### Windows 10/11
+```powershell
+cd plataforma_cursos_online\nextjs_space
+powershell -ExecutionPolicy Bypass -File install-windows.ps1
+```
+
+**Nota:** Debes ejecutar PowerShell como Administrador.
+
+---
+
+## 📖 Instalación Manual (Paso a Paso)
+
+Si prefieres una instalación manual o necesitas personalizar el proceso, sigue esta guía detallada:
+
 ## 📋 Requisitos del Sistema
 
 ### Hardware Mínimo

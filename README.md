@@ -1,469 +1,453 @@
 
-# 🎓 Plataforma de Cursos en Línea
+# 📚 Plataforma de Cursos Online - Sistema de Gestión de Aprendizaje (LMS)
 
-Una plataforma completa y moderna de gestión de cursos en línea (LMS - Learning Management System) que permite a múltiples instructores crear y gestionar cursos, y a estudiantes inscribirse y aprender a través de contenido multimedia interactivo.
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-
-## 🌟 Características Principales
-
-### Para Instructores 👨‍🏫
-- ✅ **Panel de control personalizado** con estadísticas en tiempo real
-- ✅ **Gestión completa de cursos**: Crear, editar, eliminar y organizar cursos
-- ✅ **Lecciones multimedia**:
-  - 📹 Videos de YouTube/Vimeo integrados
-  - 📄 Documentos PDF con visualizador integrado
-  - 📝 Lecciones de texto con formato Markdown
-- ✅ **Sistema de evaluaciones**:
-  - Cuestionarios de opción múltiple
-  - Calificación automática instantánea
-  - Múltiples preguntas por cuestionario
-- ✅ **Monitoreo de estudiantes**:
-  - Ver lista completa de estudiantes inscritos
-  - Seguimiento de progreso individual
-  - Historial de calificaciones por estudiante
-- ✅ **Organización flexible**: Ordenar lecciones de forma secuencial
-
-### Para Estudiantes 👨‍🎓
-- ✅ **Dashboard personalizado** con todos los cursos inscritos
-- ✅ **Catálogo de cursos** con información detallada y thumbnails
-- ✅ **Inscripción instantánea** con un solo clic
-- ✅ **Experiencia de aprendizaje interactiva**:
-  - Navegación secuencial entre lecciones
-  - Reproductor de video integrado
-  - Visor de PDFs en navegador
-  - Contenido de texto formateado
-- ✅ **Sistema de evaluaciones**:
-  - Realizar cuestionarios interactivos
-  - Ver resultados inmediatamente
-  - Revisar respuestas correctas e incorrectas
-- ✅ **Seguimiento de progreso**:
-  - Marcar lecciones como completadas
-  - Barra de progreso visual por curso
-  - Historial completo de calificaciones
-  - Porcentaje de avance por curso
-
-## 🚀 Tecnologías Utilizadas
-
-### Frontend
-- **Next.js 14** con App Router (React Server Components)
-- **TypeScript** para type safety
-- **Tailwind CSS** para estilos responsivos
-- **Radix UI + shadcn/ui** para componentes accesibles
-- **React Hook Form** para formularios
-- **TanStack Query** para gestión de estado del servidor
-
-### Backend
-- **Next.js API Routes** como backend serverless
-- **PostgreSQL** como base de datos relacional
-- **Prisma ORM** para consultas type-safe
-- **NextAuth.js** para autenticación segura
-- **bcryptjs** para hash de contraseñas
-
-### Infraestructura
-- **AWS S3** para almacenamiento de archivos
-- **Vercel** ready para despliegue instantáneo
-- **GitHub Actions** ready para CI/CD
-
-## 📋 Requisitos Previos
-
-- Node.js 18+ 
-- PostgreSQL 12+
-- Cuenta de AWS (para almacenamiento de archivos PDF)
-- Git
-
-## 🛠️ Instalación Local
-
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/davidacaceres/contenedor_cursos.git
-cd contenedor_cursos
-```
-
-### 2. Instalar dependencias
-```bash
-yarn install
-```
-
-### 3. Configurar variables de entorno
-
-Crear un archivo `.env` en la raíz del proyecto:
-
-```env
-# Base de datos PostgreSQL
-DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/cursos_db"
-
-# NextAuth - Genera un secret con: openssl rand -base64 32
-NEXTAUTH_SECRET="tu-secret-key-super-segura-aqui"
-NEXTAUTH_URL="http://localhost:3000"
-
-# AWS S3 para archivos PDF (opcional para desarrollo)
-AWS_PROFILE=hosted_storage
-AWS_REGION=us-west-2
-AWS_BUCKET_NAME=tu-bucket-name
-AWS_FOLDER_PREFIX=cursos/
-```
-
-### 4. Configurar la base de datos
-
-```bash
-# Generar cliente de Prisma
-yarn prisma generate
-
-# Ejecutar migraciones (crea las tablas)
-yarn prisma migrate dev --name init
-
-# Poblar con datos de ejemplo
-yarn prisma db seed
-```
-
-### 5. Iniciar servidor de desarrollo
-
-```bash
-yarn dev
-```
-
-La aplicación estará disponible en **http://localhost:3000**
-
-## 🚀 Despliegue en Vercel (Recomendado)
-
-### Opción 1: Deploy con botón (Más rápido)
-
-[![Deploy with Vercel](https://i.ytimg.com/vi/lAJ6LyvW_cw/hqdefault.jpg)
-
-### Opción 2: Deploy manual
-
-1. **Instalar Vercel CLI**
-```bash
-npm i -g vercel
-```
-
-2. **Login en Vercel**
-```bash
-vercel login
-```
-
-3. **Deploy desde la terminal**
-```bash
-cd contenedor_cursos
-vercel
-```
-
-4. **Configurar variables de entorno en Vercel**
-   - Ve a tu proyecto en Vercel Dashboard
-   - Settings → Environment Variables
-   - Agrega:
-     - `DATABASE_URL` (tu PostgreSQL en producción)
-     - `NEXTAUTH_SECRET` (genera uno nuevo para producción)
-     - `NEXTAUTH_URL` (tu URL de Vercel)
-     - Variables de AWS S3
-
-5. **Redeploy para aplicar las variables**
-```bash
-vercel --prod
-```
-
-### Base de datos en producción
-
-Para PostgreSQL en producción, recomendamos:
-- **[Vercel Postgres](https://vercel.com/storage/postgres)** (integración nativa)
-- **[Supabase](https://supabase.com)** (gratuito para empezar)
-- **[Railway](https://railway.app)** (PostgreSQL gratis)
-- **[Neon](https://neon.tech)** (PostgreSQL serverless)
-
-## 🚀 Otras opciones de despliegue
-
-### Railway
-
-1. Conecta tu repositorio de GitHub
-2. Railway detectará Next.js automáticamente
-3. Agrega PostgreSQL desde el marketplace
-4. Configura las variables de entorno
-5. Deploy automático
-
-### Render
-
-1. Crear nuevo "Web Service"
-2. Conectar repositorio
-3. Build command: `yarn install && yarn build`
-4. Start command: `yarn start`
-5. Agregar PostgreSQL desde el dashboard
-6. Configurar variables de entorno
-
-### DigitalOcean App Platform
-
-1. Crear nueva app desde GitHub
-2. Seleccionar el repositorio
-3. Configurar como Next.js app
-4. Agregar PostgreSQL managed database
-5. Configurar variables de entorno
-
-## 👤 Credenciales de Prueba
-
-Después de ejecutar `yarn prisma db seed`, usa estas credenciales:
-
-### 👨‍🏫 Instructores
-| Email | Contraseña | Cursos |
-|-------|------------|---------|
-| maria.garcia@instructor.com | password123 | 2 cursos creados |
-| carlos.rodriguez@instructor.com | password123 | 1 curso creado |
-
-### 👨‍🎓 Estudiantes
-| Email | Contraseña | Estado |
-|-------|------------|---------|
-| ana.lopez@student.com | password123 | Inscrita en 2 cursos, con progreso |
-| pedro.martinez@student.com | password123 | Inscrito en 2 cursos |
-| laura.sanchez@student.com | password123 | Inscrita en 1 curso |
-
-## 📁 Estructura del Proyecto
-
-```
-plataforma_cursos_online/
-├── app/                          # Next.js App Router
-│   ├── api/                     # API Routes
-│   │   ├── auth/               # NextAuth endpoints
-│   │   ├── courses/            # CRUD de cursos
-│   │   ├── enrollments/        # Inscripciones
-│   │   └── signup/             # Registro de usuarios
-│   ├── auth/                    # Páginas de autenticación
-│   │   ├── signin/             # Login
-│   │   └── signup/             # Registro
-│   ├── instructor/              # Panel de instructores
-│   │   ├── dashboard/          # Dashboard principal
-│   │   └── courses/            # Gestión de cursos
-│   ├── student/                 # Panel de estudiantes
-│   │   ├── dashboard/          # Dashboard personal
-│   │   └── courses/            # Catálogo y cursos
-│   ├── layout.tsx               # Layout principal
-│   ├── page.tsx                 # Página de inicio
-│   └── globals.css              # Estilos globales
-├── components/                   # Componentes React
-│   ├── ui/                      # Componentes base (shadcn/ui)
-│   ├── instructor/              # Componentes de instructor
-│   ├── student/                 # Componentes de estudiante
-│   ├── navbar.tsx               # Barra de navegación
-│   └── providers.tsx            # Context providers
-├── lib/                         # Utilidades
-│   ├── auth.ts                  # Configuración NextAuth
-│   ├── db.ts                    # Cliente Prisma
-│   ├── aws-config.ts            # Configuración AWS S3
-│   ├── types.ts                 # Tipos TypeScript
-│   └── utils.ts                 # Funciones utilitarias
-├── prisma/                      # Base de datos
-│   └── schema.prisma            # Esquema de BD
-├── scripts/                     # Scripts de utilidad
-│   └── seed.ts                  # Datos de prueba
-├── types/                       # Definiciones de tipos
-│   └── next-auth.d.ts           # Tipos de NextAuth
-├── package.json                 # Dependencias
-├── tsconfig.json                # Config TypeScript
-├── tailwind.config.ts           # Config Tailwind
-└── next.config.js               # Config Next.js
-```
-
-## 🗄️ Modelo de Base de Datos
-
-```prisma
-User (Usuarios)
-├── id: String (UUID)
-├── name: String
-├── email: String (único)
-├── password: String (hasheado)
-├── role: Enum (INSTRUCTOR | STUDENT)
-└── createdAt: DateTime
-
-Course (Cursos)
-├── id: String (UUID)
-├── title: String
-├── description: String
-├── thumbnail: String (URL)
-├── instructorId: String (FK → User)
-├── lessons: Lesson[]
-└── enrollments: Enrollment[]
-
-Lesson (Lecciones)
-├── id: String (UUID)
-├── title: String
-├── type: Enum (VIDEO | PDF | TEXT)
-├── content: String (para TEXT)
-├── videoUrl: String (para VIDEO)
-├── pdfUrl: String (para PDF)
-├── order: Int
-├── duration: Int (minutos)
-├── courseId: String (FK → Course)
-└── quiz: Quiz?
-
-Quiz (Cuestionarios)
-├── id: String (UUID)
-├── title: String
-├── lessonId: String (FK → Lesson)
-└── questions: Question[]
-
-Question (Preguntas)
-├── id: String (UUID)
-├── text: String
-├── optionA/B/C/D: String
-├── correctOption: String
-├── order: Int
-└── quizId: String (FK → Quiz)
-
-Enrollment (Inscripciones)
-├── id: String (UUID)
-├── userId: String (FK → User)
-├── courseId: String (FK → Course)
-└── enrolledAt: DateTime
-
-Progress (Progreso)
-├── id: String (UUID)
-├── userId: String (FK → User)
-├── lessonId: String (FK → Lesson)
-├── completed: Boolean
-└── completedAt: DateTime?
-
-QuizResult (Resultados)
-├── id: String (UUID)
-├── userId: String (FK → User)
-├── quizId: String (FK → Quiz)
-├── score: Int
-├── answers: JSON
-└── completedAt: DateTime
-```
-
-## 🎯 Funcionalidades Detalladas
-
-### Sistema de Autenticación
-- Registro con validación de email único
-- Login seguro con hash bcrypt
-- Sesiones con NextAuth.js
-- Protección de rutas por rol
-- Redirección automática según rol
-
-### Gestión de Cursos (Instructores)
-- Crear cursos con formulario validado
-- Upload de thumbnails a S3
-- Agregar lecciones de múltiples tipos
-- Crear cuestionarios con editor visual
-- Ver estadísticas de inscripciones
-- Editar y eliminar contenido
-
-### Sistema de Lecciones
-- **Videos**: Embed de YouTube/Vimeo con reproductor nativo
-- **PDFs**: Upload a S3 + visualizador integrado
-- **Texto**: Markdown con preview en tiempo real
-- Navegación secuencial automática
-- Marcado de completadas
-- Tiempo estimado por lección
-
-### Evaluaciones Interactivas
-- Cuestionarios con múltiples preguntas
-- 4 opciones de respuesta (A, B, C, D)
-- Calificación automática en tiempo real
-- Feedback inmediato (correcto/incorrecto)
-- Historial de intentos
-- Porcentaje de aciertos
-
-### Dashboard de Estudiantes
-- Vista de cursos inscritos con progreso
-- Recomendaciones de cursos
-- Gráficas de progreso
-- Próximas lecciones
-- Historial de calificaciones
-
-### Dashboard de Instructores
-- Total de cursos creados
-- Total de estudiantes
-- Lista de cursos con estadísticas
-- Estudiantes por curso
-- Calificaciones promedio
-
-## 🔒 Seguridad
-
-- ✅ Contraseñas hasheadas con bcrypt (12 rounds)
-- ✅ Tokens JWT seguros con NextAuth.js
-- ✅ Protección CSRF integrada
-- ✅ Validación de datos en servidor
-- ✅ Sanitización de inputs
-- ✅ Protección de rutas por rol
-- ✅ Variables de entorno para secrets
-- ✅ HTTPS ready en producción
-
-## 🧪 Testing
-
-```bash
-# Ejecutar tests (cuando estén implementados)
-yarn test
-
-# Tests en modo watch
-yarn test:watch
-
-# Coverage
-yarn test:coverage
-```
-
-## 📊 Monitoreo y Analytics
-
-Para producción, recomendamos integrar:
-- **Vercel Analytics** para métricas de rendimiento
-- **Sentry** para error tracking
-- **PostHog** o **Mixpanel** para analytics de usuarios
-
-## 🔄 Roadmap Futuro
-
-- [ ] Sistema de certificados al completar cursos
-- [ ] Chat en vivo entre instructor-estudiante
-- [ ] Foros de discusión por curso
-- [ ] Sistema de calificaciones y reviews
-- [ ] Notificaciones por email
-- [ ] Exportar progreso a PDF
-- [ ] Dark mode completo
-- [ ] Aplicación móvil (React Native)
-- [ ] Integración con Zoom para clases en vivo
-- [ ] Sistema de badges y gamificación
-
-## 🤝 Contribuir
-
-Las contribuciones son bienvenidas. Para contribuir:
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-### Guías de contribución
-- Seguir el estilo de código existente
-- Agregar tests para nuevas funcionalidades
-- Actualizar la documentación
-- Hacer commits descriptivos
-
-## 📝 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## 👨‍💻 Autor
-
-**David Cáceres**
-- GitHub: [@davidacaceres](https://github.com/davidacaceres)
-- Repositorio: [contenedor_cursos](https://github.com/davidacaceres/contenedor_cursos)
-
-## 📧 Soporte y Contacto
-
-- **Issues**: Para reportar bugs o solicitar features, usa [GitHub Issues](https://github.com/davidacaceres/contenedor_cursos/issues)
-- **Discusiones**: Para preguntas generales, usa [GitHub Discussions](https://github.com/davidacaceres/contenedor_cursos/discussions)
-
-## 🙏 Agradecimientos
-
-- [Next.js](https://nextjs.org/) por el framework
-- [Vercel](https://vercel.com/) por el hosting
-- [Prisma](https://www.prisma.io/) por el ORM
-- [shadcn/ui](https://ui.shadcn.com/) por los componentes
-- [Tailwind CSS](https://tailwindcss.com/) por los estilos
+Sistema completo de gestión de aprendizaje (Learning Management System) diseñado para instituciones educativas, instructores independientes y organizaciones que desean ofrecer cursos online de forma profesional.
 
 ---
 
-**⭐ Si este proyecto te fue útil, considera darle una estrella en GitHub!**
+## ✨ Características Principales
 
-**🎓 ¡Feliz aprendizaje y enseñanza! 📚**
+### 🎓 Para Estudiantes
+- **Catálogo de Cursos**: Explora y matricúlate en cursos disponibles
+- **Rutas de Aprendizaje**: Sigue trayectorias educativas estructuradas
+- **Seguimiento de Progreso**: Visualiza tu avance en tiempo real
+- **Tareas y Entregas**: Sube trabajos y recibe calificaciones
+- **Exámenes y Cuestionarios**: Realiza evaluaciones con calificación automática
+- **Foros de Discusión**: Participa en debates y preguntas con la comunidad
+- **Certificados**: Obtén certificados al completar cursos y rutas de aprendizaje
+- **Notificaciones**: Recibe alertas sobre nuevos contenidos y actualizaciones
+
+### 👨‍🏫 Para Instructores
+- **Gestión de Cursos**: Crea y administra cursos con módulos y lecciones
+- **Rutas de Aprendizaje**: Diseña secuencias de cursos relacionados
+- **Sistema de Calificaciones**: Califica tareas y proporciona retroalimentación
+- **Rúbricas de Evaluación**: Define criterios de evaluación detallados
+- **Calificación Automática**: Los cuestionarios de opción múltiple se califican automáticamente
+- **Foros Moderados**: Gestiona discusiones y responde preguntas
+- **Analytics y Reportes**: Visualiza métricas de desempeño de estudiantes
+- **Gestión de Archivos**: Sube y organiza materiales del curso
+
+### 🔐 Seguridad y Autenticación
+- Autenticación segura con NextAuth.js
+- Roles de usuario (Estudiante, Instructor, Admin)
+- Protección de rutas y contenido
+- Gestión de sesiones
+
+### 💾 Almacenamiento Flexible
+- **Almacenamiento Local**: Para instalaciones on-premise
+- **AWS S3**: Para almacenamiento en la nube
+- Fácil cambio entre opciones mediante variables de entorno
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+### Frontend
+- **Next.js 14**: Framework React con SSR y SSG
+- **React 18**: Biblioteca de UI
+- **TypeScript**: Tipado estático
+- **Tailwind CSS**: Framework de estilos
+- **Radix UI**: Componentes de UI accesibles
+- **Shadcn/ui**: Sistema de componentes
+- **React Hook Form**: Gestión de formularios
+- **Zod**: Validación de esquemas
+
+### Backend
+- **Next.js API Routes**: Endpoints RESTful
+- **Prisma ORM**: Gestión de base de datos
+- **PostgreSQL**: Base de datos relacional
+- **NextAuth.js**: Autenticación y autorización
+
+### Servicios Adicionales
+- **AWS SDK v3**: Integración con S3
+- **jsPDF**: Generación de certificados PDF
+- **React ChartJS 2**: Visualización de datos
+- **Date-fns**: Manipulación de fechas
+- **Bcrypt**: Encriptación de contraseñas
+
+---
+
+## 📦 Instalación Rápida
+
+### Opción 1: Instalación Automática (Recomendada)
+
+#### En Ubuntu/Linux:
+```bash
+cd plataforma_cursos_online/nextjs_space
+chmod +x install-ubuntu.sh
+./install-ubuntu.sh
+```
+
+#### En Windows:
+```powershell
+cd plataforma_cursos_online\nextjs_space
+powershell -ExecutionPolicy Bypass -File install-windows.ps1
+```
+
+### Opción 2: Instalación Manual
+
+Ver la [Guía de Instalación Completa](./INSTALLATION.md) para instrucciones detalladas paso a paso.
+
+---
+
+## 🚀 Inicio Rápido
+
+### Desarrollo
+```bash
+# Iniciar servidor de desarrollo
+yarn dev
+```
+
+Aplicación disponible en: `http://localhost:3000`
+
+### Producción
+```bash
+# Compilar
+yarn build
+
+# Iniciar
+yarn start
+
+# O con PM2 (recomendado)
+pm2 start ecosystem.config.js
+```
+
+---
+
+## 📖 Documentación Completa
+
+- **[INSTALLATION.md](./INSTALLATION.md)** - Guía completa de instalación on-premise
+- **[STORAGE_GUIDE.md](./STORAGE_GUIDE.md)** - Configuración de almacenamiento local y S3
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Guía de despliegue en producción
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+```
+nextjs_space/
+├── app/                      # Directorio principal de la aplicación
+│   ├── api/                 # Endpoints de API
+│   │   ├── assignments/     # Gestión de tareas
+│   │   ├── auth/           # Autenticación
+│   │   ├── courses/        # Gestión de cursos
+│   │   ├── enrollments/    # Matrículas
+│   │   ├── forums/         # Foros de discusión
+│   │   ├── learning-paths/ # Rutas de aprendizaje
+│   │   ├── progress/       # Seguimiento de progreso
+│   │   └── ...
+│   ├── auth/               # Páginas de autenticación
+│   ├── courses/            # Páginas de cursos
+│   ├── instructor/         # Panel de instructor
+│   ├── student/            # Panel de estudiante
+│   └── page.tsx            # Página principal
+├── components/             # Componentes reutilizables
+│   ├── instructor/         # Componentes de instructor
+│   ├── student/           # Componentes de estudiante
+│   ├── forums/            # Componentes de foros
+│   └── ui/                # Componentes de interfaz
+├── lib/                   # Utilidades y configuraciones
+│   ├── auth.ts           # Configuración de NextAuth
+│   ├── db.ts             # Cliente Prisma
+│   ├── storage.ts        # Sistema de almacenamiento
+│   ├── aws-config.ts     # Configuración AWS
+│   └── types.ts          # Tipos TypeScript
+├── prisma/               # Esquema de base de datos
+│   └── schema.prisma
+├── scripts/              # Scripts de utilidad
+│   └── seed.ts          # Datos iniciales
+├── public/              # Archivos estáticos
+├── .env                 # Variables de entorno
+├── install-ubuntu.sh    # Script de instalación para Ubuntu
+├── install-windows.ps1  # Script de instalación para Windows
+└── package.json         # Dependencias del proyecto
+```
+
+---
+
+## 🔧 Configuración
+
+### Variables de Entorno Esenciales
+
+```env
+# Base de datos
+DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/plataforma_cursos"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="tu_secret_generado"
+
+# Almacenamiento
+STORAGE_TYPE="local"  # o "s3"
+LOCAL_STORAGE_PATH="./uploads"
+
+# AWS S3 (si usas S3)
+# AWS_BUCKET_NAME="tu-bucket"
+# AWS_REGION="us-east-1"
+# AWS_ACCESS_KEY_ID="tu_access_key"
+# AWS_SECRET_ACCESS_KEY="tu_secret_key"
+```
+
+Ver [documentación completa de variables de entorno](./INSTALLATION.md#configuración-completa-recomendada).
+
+---
+
+## 👥 Usuarios de Prueba
+
+Después de ejecutar el seed (`yarn prisma db seed`):
+
+| Rol | Email | Contraseña |
+|-----|-------|-----------|
+| Instructor | instructor@test.com | password123 |
+| Estudiante | student@test.com | password123 |
+
+⚠️ **IMPORTANTE**: Cambia estas contraseñas en producción.
+
+---
+
+## 📊 Base de Datos
+
+### Esquema Principal
+
+El sistema utiliza PostgreSQL con las siguientes tablas principales:
+
+- **User**: Usuarios del sistema
+- **Course**: Cursos disponibles
+- **Module**: Módulos de los cursos
+- **Lesson**: Lecciones individuales
+- **LearningPath**: Rutas de aprendizaje
+- **Enrollment**: Matrículas de estudiantes
+- **Assignment**: Tareas y trabajos
+- **Submission**: Entregas de estudiantes
+- **Quiz**: Cuestionarios y exámenes
+- **ForumThread**: Hilos de discusión
+- **ForumReply**: Respuestas en foros
+- **Certificate**: Certificados generados
+- **Notification**: Notificaciones del sistema
+
+Ver esquema completo en [`prisma/schema.prisma`](./prisma/schema.prisma).
+
+---
+
+## 🔄 Comandos Útiles
+
+### Prisma
+```bash
+# Generar cliente Prisma
+yarn prisma generate
+
+# Aplicar migraciones
+yarn prisma migrate deploy
+
+# Poblar base de datos
+yarn prisma db seed
+
+# Abrir Prisma Studio
+yarn prisma studio
+```
+
+### PM2 (Gestión de Procesos)
+```bash
+# Ver estado
+pm2 status
+
+# Ver logs
+pm2 logs plataforma-cursos
+
+# Reiniciar
+pm2 restart plataforma-cursos
+
+# Detener
+pm2 stop plataforma-cursos
+
+# Eliminar
+pm2 delete plataforma-cursos
+```
+
+### Desarrollo
+```bash
+# Verificar tipos TypeScript
+yarn tsc --noEmit
+
+# Linter
+yarn lint
+
+# Limpiar caché
+rm -rf .next node_modules
+yarn install
+```
+
+---
+
+## 🐛 Solución de Problemas
+
+### La aplicación no inicia
+```bash
+# Verificar logs
+pm2 logs plataforma-cursos
+
+# Verificar puerto
+netstat -tuln | grep 3000
+
+# Verificar variables de entorno
+cat .env
+```
+
+### Error de base de datos
+```bash
+# Verificar conexión a PostgreSQL
+psql -U usuario -d base_datos -h localhost
+
+# Regenerar Prisma
+yarn prisma generate
+yarn prisma migrate deploy
+```
+
+### Problemas de permisos (uploads)
+```bash
+# Linux/Mac
+chmod 755 ./uploads
+chown -R $USER:$USER ./uploads
+
+# Verificar
+ls -la ./uploads
+```
+
+Ver más soluciones en [INSTALLATION.md](./INSTALLATION.md#solución-de-problemas).
+
+---
+
+## 🔐 Seguridad
+
+### Mejores Prácticas Implementadas
+
+✅ Contraseñas encriptadas con bcrypt  
+✅ Variables de entorno para secretos  
+✅ Validación de datos en servidor  
+✅ Protección CSRF  
+✅ Sanitización de inputs  
+✅ Autenticación basada en sesiones  
+✅ Roles y permisos  
+
+### Recomendaciones Adicionales
+
+- Usa HTTPS en producción
+- Configura firewall (UFW en Linux)
+- Implementa rate limiting
+- Mantén dependencias actualizadas
+- Realiza backups regulares
+- Monitorea logs de seguridad
+
+---
+
+## 📈 Escalabilidad
+
+### Para Alto Tráfico
+
+1. **Load Balancer**: Múltiples instancias con Nginx
+2. **CDN**: CloudFlare o AWS CloudFront
+3. **Database Pooling**: pgBouncer para PostgreSQL
+4. **Cache**: Redis para sesiones y datos
+5. **Horizontal Scaling**: Docker + Kubernetes
+
+### Optimizaciones
+
+- Índices en base de datos
+- Lazy loading de imágenes
+- Code splitting en Next.js
+- Compresión gzip/brotli
+- Caché de assets estáticos
+
+---
+
+## 🤝 Contribución
+
+Este proyecto está en desarrollo activo. Si deseas contribuir:
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📝 Roadmap
+
+### Versión 1.1.0 (Próxima)
+- [ ] Notificaciones por email (Resend)
+- [ ] Notificaciones por WhatsApp (Twilio)
+- [ ] Sistema de ayuda contextual
+- [ ] Chat en vivo entre instructor-estudiante
+- [ ] Exportación de reportes en Excel
+
+### Versión 1.2.0
+- [ ] Integración con videoconferencias (Zoom/Meet)
+- [ ] Gamificación (puntos, badges, leaderboards)
+- [ ] Revisión por pares
+- [ ] Multi-idioma (i18n)
+- [ ] App móvil (React Native)
+
+### Versión 2.0.0
+- [ ] AI-powered recommendations
+- [ ] Adaptive learning paths
+- [ ] Advanced analytics con ML
+- [ ] Integración con LTI (Learning Tools Interoperability)
+
+---
+
+## 🆘 Soporte
+
+### Documentación
+- [Guía de Instalación](./INSTALLATION.md)
+- [Configuración de Almacenamiento](./STORAGE_GUIDE.md)
+- [Guía de Despliegue](./DEPLOYMENT.md)
+
+### Recursos Externos
+- [Documentación de Next.js](https://nextjs.org/docs)
+- [Documentación de Prisma](https://www.prisma.io/docs)
+- [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
+- [NextAuth.js Documentation](https://next-auth.js.org/)
+
+### Reportar Problemas
+Al reportar un bug, incluye:
+- Versión de Node.js: `node --version`
+- Sistema operativo
+- Logs relevantes: `pm2 logs plataforma-cursos`
+- Pasos para reproducir el error
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+---
+
+## 🙏 Agradecimientos
+
+- [Next.js](https://nextjs.org/) - Framework React
+- [Prisma](https://www.prisma.io/) - ORM
+- [Shadcn/ui](https://ui.shadcn.com/) - Componentes UI
+- [Radix UI](https://www.radix-ui.com/) - Primitivos de UI
+- Toda la comunidad de código abierto
+
+---
+
+## 📞 Contacto
+
+Para preguntas, sugerencias o colaboraciones, abre un issue en el repositorio.
+
+---
+
+<div align="center">
+
+**Hecho con ❤️ para la comunidad educativa**
+
+[⬆ Volver arriba](#-plataforma-de-cursos-online---sistema-de-gestión-de-aprendizaje-lms)
+
+</div>
