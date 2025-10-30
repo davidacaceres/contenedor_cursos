@@ -27,10 +27,10 @@ export async function POST(request: Request) {
     }
 
     // Verificar si el curso existe y está publicado
-    const course = await prisma.course.findUnique({
+    const course = await prisma.course.findFirst({
       where: { 
         id: courseId,
-        isPublished: true,
+        status: 'PUBLISHED',
       },
     });
 

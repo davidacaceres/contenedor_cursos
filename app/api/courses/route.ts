@@ -33,14 +33,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Crear el curso
+    // Crear el curso en estado DRAFT por defecto
     const course = await prisma.course.create({
       data: {
         title,
         description,
         thumbnail,
         instructorId,
-        isPublished: true,
+        status: 'DRAFT',
       },
       include: {
         instructor: {
