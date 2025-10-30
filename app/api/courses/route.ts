@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         description,
         thumbnail,
         instructorId,
-        isPublished: true,
+        isPublished: false,
       },
       include: {
         instructor: {
