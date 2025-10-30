@@ -435,11 +435,10 @@ if [ -d "node_modules" ]; then
     sudo chown -R $USER:$USER node_modules 2>/dev/null || true
 fi
 
-# Configurar variables de entorno para Prisma (evitar problemas con permisos)
-export PRISMA_QUERY_ENGINE_BINARY="$(pwd)/node_modules/.prisma/client/query-engine-debian-openssl-3.0.x"
-export PRISMA_MIGRATION_ENGINE_BINARY="$(pwd)/node_modules/.prisma/client/migration-engine-debian-openssl-3.0.x"
+# Configurar directorio de caché local para Prisma (evitar problemas con permisos)
 export XDG_CACHE_HOME="$(pwd)/.cache"
 mkdir -p .cache
+print_info "Usando caché local: $XDG_CACHE_HOME"
 
 print_info "Generando cliente Prisma..."
 XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma generate
