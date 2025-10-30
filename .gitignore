@@ -5,7 +5,6 @@
 /node_modules
 /.pnp
 .pnp.js
-.yarn/install-state.gz
 
 # testing
 /coverage
@@ -28,8 +27,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
 .env
+.env*.local
 
 # vercel
 .vercel
@@ -38,5 +37,28 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-prisma/migrations
+# uploads directory
+/uploads
+!/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# PM2
+.pm2
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp/
+temp/
