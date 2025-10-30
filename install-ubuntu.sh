@@ -369,6 +369,14 @@ print_message "Archivo .env creado correctamente"
 
 print_header "PASO 9: Instalando Dependencias del Proyecto"
 
+# Verificar y corregir yarn.lock si es un symlink
+if [ -L "yarn.lock" ]; then
+    print_warning "Detectado yarn.lock como symlink, corrigiendo..."
+    rm yarn.lock
+    touch yarn.lock
+    print_message "yarn.lock corregido"
+fi
+
 print_info "Esto puede tomar varios minutos..."
 yarn install
 
