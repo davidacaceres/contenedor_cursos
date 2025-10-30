@@ -36,6 +36,19 @@ export default async function InstructorDashboardPage() {
           createdAt: 'desc',
         },
       },
+      learningPathsCreated: {
+        include: {
+          _count: {
+            select: {
+              courses: true,
+              enrollments: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
   });
 

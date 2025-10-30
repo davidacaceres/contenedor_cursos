@@ -17,7 +17,9 @@ import {
   Calendar,
   Eye,
   Edit,
-  MoreVertical
+  MoreVertical,
+  BarChart,
+  Route
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -33,6 +35,7 @@ interface InstructorDashboardProps {
 
 export function InstructorDashboard({ instructor }: InstructorDashboardProps) {
   const courses = instructor?.coursesCreated || [];
+  const learningPaths = instructor?.learningPathsCreated || [];
   const totalStudents = courses.reduce((sum: number, course: any) => sum + (course._count?.enrollments || 0), 0);
   const totalLessons = courses.reduce((sum: number, course: any) => sum + (course._count?.lessons || 0), 0);
 
@@ -97,13 +100,11 @@ export function InstructorDashboard({ instructor }: InstructorDashboardProps) {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Tasa de éxito</p>
-                  <p className="text-3xl font-bold text-yellow-600">
-                    {totalStudents > 0 ? '85%' : '0%'}
-                  </p>
+                  <p className="text-sm font-medium text-gray-600">Rutas de Aprendizaje</p>
+                  <p className="text-3xl font-bold text-yellow-600">{learningPaths.length}</p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-yellow-100">
-                  <TrendingUp className="h-6 w-6 text-yellow-600" />
+                  <Route className="h-6 w-6 text-yellow-600" />
                 </div>
               </div>
             </CardContent>
@@ -169,9 +170,15 @@ export function InstructorDashboard({ instructor }: InstructorDashboardProps) {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={course.isPublished ? 'default' : 'secondary'}>
-                          {course.isPublished ? 'Publicado' : 'Borrador'}
-                        </Badge>
+                        {course.status === 'PUBLISHED' && (
+                          <Badge className="bg-green-600 hover:bg-green-700">Publicado</Badge>
+                        )}
+                        {course.status === 'DRAFT' && (
+                          <Badge variant="secondary">Borrador</Badge>
+                        )}
+                        {course.status === 'ARCHIVED' && (
+                          <Badge variant="outline">Archivado</Badge>
+                        )}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -183,6 +190,12 @@ export function InstructorDashboard({ instructor }: InstructorDashboardProps) {
                               <Link href={`/instructor/courses/${course.id}`}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 Ver detalles
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/instructor/courses/${course.id}/analytics`}>
+                                <BarChart className="h-4 w-4 mr-2" />
+                                Ver analíticas
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
@@ -280,6 +293,12 @@ export function InstructorDashboard({ instructor }: InstructorDashboardProps) {
                   <Link href="/instructor/courses/create">
                     <Plus className="h-4 w-4 mr-2" />
                     Crear Nuevo Curso
+                  </Link>
+                </Button>
+                <Button className="w-full justify-start" variant="outline" asChild>
+                  <Link href="/instructor/learning-paths/create">
+                    <Route className="h-4 w-4 mr-2" />
+                    Crear Ruta de Aprendizaje
                   </Link>
                 </Button>
                 <Button className="w-full justify-start" variant="outline" asChild>
