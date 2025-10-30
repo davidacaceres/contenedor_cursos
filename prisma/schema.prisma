@@ -23,6 +23,12 @@ enum LessonType {
   QUIZ
 }
 
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -51,46 +57,56 @@ model Session {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  name            String?
-  email           String         @unique
-  password        String?
-  emailVerified   DateTime?
-  image           String?
-  role            UserRole       @default(STUDENT)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id                      String                     @id @default(cuid())
+  name                    String?
+  email                   String                     @unique
+  password                String?
+  emailVerified           DateTime?
+  image                   String?
+  role                    UserRole                   @default(STUDENT)
+  createdAt               DateTime                   @default(now())
+  updatedAt               DateTime                   @updatedAt
   
-  accounts        Account[]
-  sessions        Session[]
-  coursesCreated  Course[]       @relation("CourseInstructor")
-  enrollments     Enrollment[]
-  progress        Progress[]
-  quizResults     QuizResult[]
-  certificates    Certificate[]
-  submissions     Submission[]
-  comments        Comment[]
-  notifications   Notification[]
+  accounts                Account[]
+  sessions                Session[]
+  coursesCreated          Course[]                   @relation("CourseInstructor")
+  enrollments             Enrollment[]
+  progress                Progress[]
+  quizResults             QuizResult[]
+  certificates            Certificate[]
+  submissions             Submission[]
+  comments                Comment[]
+  notifications           Notification[]
+  learningPathsCreated    LearningPath[]             @relation("LearningPathInstructor")
+  learningPathEnrollments LearningPathEnrollment[]
+  learningPathCertificates LearningPathCertificate[]
+  forumThreads            ForumThread[]
+  forumReplies            ForumReply[]
+  forumVotes              ForumVote[]
 }
 
 model Course {
-  id           String        @id @default(cuid())
+  id           String               @id @default(cuid())
   title        String
-  description  String        @db.Text
+  description  String               @db.Text
   thumbnail    String?
   instructorId String
-  isPublished  Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  status       CourseStatus         @default(DRAFT)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  publishedAt  DateTime?
   
-  instructor   User          @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
-  modules      Module[]
-  lessons      Lesson[]
-  enrollments  Enrollment[]
-  certificates Certificate[]
-  assignments  Assignment[]
+  instructor       User                 @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  modules          Module[]
+  lessons          Lesson[]
+  enrollments      Enrollment[]
+  certificates     Certificate[]
+  assignments      Assignment[]
+  learningPathCourses LearningPathCourse[]
+  forumThreads     ForumThread[]
   
   @@index([instructorId])
+  @@index([status])
 }
 
 model Module {
@@ -102,8 +118,9 @@ model Module {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons     Lesson[]
+  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons      Lesson[]
+  forumThreads ForumThread[]
   
   @@index([courseId])
   @@unique([courseId, order])
@@ -124,11 +141,12 @@ model Lesson {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   
-  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  module      Module?     @relation(fields: [moduleId], references: [id], onDelete: SetNull)
-  quizzes     Quiz[]
-  progress    Progress[]
-  assignments Assignment[]
+  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module       Module?       @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  quizzes      Quiz[]
+  progress     Progress[]
+  assignments  Assignment[]
+  forumThreads ForumThread[]
   
   @@index([courseId])
   @@index([moduleId])
@@ -330,6 +348,8 @@ enum NotificationType {
   COURSE_COMPLETED
   NEW_ENROLLMENT
   QUIZ_GRADED
+  FORUM_REPLY
+  FORUM_SOLUTION_MARKED
 }
 
 model Notification {
@@ -356,4 +376,145 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// Learning Paths Models
+model LearningPath {
+  id               String                    @id @default(cuid())
+  title            String
+  description      String                    @db.Text
+  thumbnail        String?
+  instructorId     String
+  level            String?                   // Beginner, Intermediate, Advanced
+  estimatedHours   Int?                      // Total estimated hours to complete
+  isPublished      Boolean                   @default(false)
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  
+  instructor       User                      @relation("LearningPathInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  courses          LearningPathCourse[]
+  enrollments      LearningPathEnrollment[]
+  certificates     LearningPathCertificate[]
+  
+  @@index([instructorId])
+  @@index([isPublished])
+}
+
+model LearningPathCourse {
+  id             String       @id @default(cuid())
+  learningPathId String
+  courseId       String
+  order          Int          // Order of course in the learning path
+  isRequired     Boolean      @default(true) // Is this course required or optional?
+  createdAt      DateTime     @default(now())
+  
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([learningPathId, courseId])
+  @@unique([learningPathId, order])
+  @@index([learningPathId])
+  @@index([courseId])
+}
+
+model LearningPathEnrollment {
+  id             String       @id @default(cuid())
+  userId         String
+  learningPathId String
+  enrolledAt     DateTime     @default(now())
+  completedAt    DateTime?
+  
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, learningPathId])
+  @@index([userId])
+  @@index([learningPathId])
+}
+
+model LearningPathCertificate {
+  id              String       @id @default(cuid())
+  certificateCode String       @unique
+  userId          String
+  learningPathId  String
+  issuedAt        DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+  
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningPath    LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, learningPathId])
+  @@index([userId])
+  @@index([learningPathId])
+  @@index([certificateCode])
+}
+
+// Forum Discussion Models
+model ForumThread {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  authorId    String
+  courseId    String
+  moduleId    String?
+  lessonId    String?
+  isPinned    Boolean  @default(false)
+  isLocked    Boolean  @default(false)
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  course   Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module   Module?       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lesson   Lesson?       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  replies  ForumReply[]
+  votes    ForumVote[]
+
+  @@index([authorId])
+  @@index([courseId])
+  @@index([moduleId])
+  @@index([lessonId])
+  @@index([createdAt])
+}
+
+model ForumReply {
+  id                 String   @id @default(cuid())
+  content            String   @db.Text
+  authorId           String
+  threadId           String
+  parentReplyId      String?
+  isMarkedAsSolution Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  thread       ForumThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  parentReply  ForumReply?   @relation("ReplyToReply", fields: [parentReplyId], references: [id], onDelete: Cascade)
+  childReplies ForumReply[]  @relation("ReplyToReply")
+  votes        ForumVote[]
+
+  @@index([authorId])
+  @@index([threadId])
+  @@index([parentReplyId])
+  @@index([createdAt])
+}
+
+model ForumVote {
+  id        String   @id @default(cuid())
+  userId    String
+  threadId  String?
+  replyId   String?
+  voteType  String   // "upvote" or "downvote"
+  createdAt DateTime @default(now())
+
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread ForumThread? @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  reply  ForumReply?  @relation(fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, threadId])
+  @@unique([userId, replyId])
+  @@index([userId])
+  @@index([threadId])
+  @@index([replyId])
 }
