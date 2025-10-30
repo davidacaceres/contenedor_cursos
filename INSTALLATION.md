@@ -3,6 +3,47 @@
 
 Esta guía te ayudará a instalar y configurar la Plataforma de Cursos Online en tu propio servidor.
 
+## 📁 Ubicación de Instalación
+
+### Directorios Recomendados
+
+**Para desarrollo:**
+- `/home/usuario/plataforma_cursos_online`
+- No requiere permisos especiales
+
+**Para producción:**
+- `/opt/contenedor_cursos` ✅ (Recomendado)
+- `/var/www/plataforma_cursos`
+- `/srv/plataforma_cursos`
+
+### Instalación en /opt (Producción)
+
+Si instalas en `/opt/`, asegúrate de:
+
+1. **Clonar el repositorio con permisos correctos:**
+```bash
+sudo git clone https://github.com/davidacaceres/contenedor_cursos.git /opt/contenedor_cursos
+sudo chown -R $USER:$USER /opt/contenedor_cursos
+cd /opt/contenedor_cursos/nextjs_space
+```
+
+2. **El script de instalación ajustará automáticamente los permisos necesarios**
+
+3. **Alternativa: Usar tu directorio home y luego mover:**
+```bash
+# Instalar en home primero
+cd ~
+git clone https://github.com/davidacaceres/contenedor_cursos.git
+cd contenedor_cursos/nextjs_space
+./install-ubuntu.sh
+
+# Después mover a /opt (opcional)
+sudo mv ~/contenedor_cursos /opt/
+sudo chown -R $USER:$USER /opt/contenedor_cursos
+```
+
+---
+
 ## 🚀 Instalación Rápida con Scripts Automáticos
 
 Para una instalación rápida y sin complicaciones, usa los scripts de instalación automática incluidos:

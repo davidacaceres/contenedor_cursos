@@ -67,6 +67,15 @@ echo -e "${NC}"
 print_info "Este script instalará automáticamente todos los componentes necesarios."
 print_warning "Asegúrate de tener permisos sudo y conexión a internet estable."
 echo ""
+
+# Advertencia especial para instalaciones en /opt
+CURRENT_DIR=$(pwd)
+if [[ "$CURRENT_DIR" == /opt/* ]]; then
+    print_warning "Detectada instalación en /opt - se requerirán permisos elevados"
+    print_info "El script ajustará automáticamente los permisos necesarios"
+    echo ""
+fi
+
 read -p "¿Deseas continuar con la instalación? (s/n): " -n 1 -r
 echo ""
 if [[ ! $REPLY =~ ^[SsYy]$ ]]; then
@@ -258,6 +267,26 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
+# Verificar y corregir permisos del directorio de instalación
+print_info "Verificando permisos del directorio de instalación..."
+INSTALL_DIR_OWNER=$(stat -c '%U' "$INSTALL_DIR")
+
+if [ "$INSTALL_DIR_OWNER" != "$USER" ]; then
+    print_warning "El directorio pertenece a '$INSTALL_DIR_OWNER', no a '$USER'"
+    print_info "Cambiando propietario del directorio a $USER..."
+    
+    # Si estamos en /opt, necesitamos sudo
+    if [[ "$INSTALL_DIR" == /opt/* ]]; then
+        sudo chown -R $USER:$USER "$INSTALL_DIR"
+    else
+        chown -R $USER:$USER "$INSTALL_DIR" 2>/dev/null || sudo chown -R $USER:$USER "$INSTALL_DIR"
+    fi
+    
+    print_message "Permisos actualizados correctamente"
+else
+    print_message "Permisos correctos en el directorio"
+fi
+
 print_message "Repositorio localizado correctamente"
 
 ###############################################################################
@@ -377,8 +406,20 @@ if [ -L "yarn.lock" ]; then
     print_message "yarn.lock corregido"
 fi
 
-print_info "Esto puede tomar varios minutos..."
+# Limpiar instalaciones anteriores problemáticas
+if [ -d "node_modules/.prisma" ]; then
+    print_info "Limpiando instalación anterior de Prisma..."
+    rm -rf node_modules/.prisma
+fi
+
+print_info "Instalando dependencias (esto puede tomar varios minutos)..."
 yarn install
+
+# Asegurarse de que los permisos sean correctos después de la instalación
+if [[ "$INSTALL_DIR" == /opt/* ]]; then
+    print_info "Verificando permisos finales de node_modules..."
+    sudo chown -R $USER:$USER node_modules 2>/dev/null || true
+fi
 
 print_message "Dependencias instaladas correctamente"
 
@@ -387,6 +428,12 @@ print_message "Dependencias instaladas correctamente"
 ###############################################################################
 
 print_header "PASO 10: Configurando Prisma y Migraciones"
+
+# Verificar permisos de node_modules antes de ejecutar prisma
+if [ -d "node_modules" ]; then
+    print_info "Verificando permisos de node_modules..."
+    sudo chown -R $USER:$USER node_modules 2>/dev/null || true
+fi
 
 print_info "Generando cliente Prisma..."
 yarn prisma generate
