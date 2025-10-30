@@ -435,11 +435,17 @@ if [ -d "node_modules" ]; then
     sudo chown -R $USER:$USER node_modules 2>/dev/null || true
 fi
 
+# Configurar variables de entorno para Prisma (evitar problemas con permisos)
+export PRISMA_QUERY_ENGINE_BINARY="$(pwd)/node_modules/.prisma/client/query-engine-debian-openssl-3.0.x"
+export PRISMA_MIGRATION_ENGINE_BINARY="$(pwd)/node_modules/.prisma/client/migration-engine-debian-openssl-3.0.x"
+export XDG_CACHE_HOME="$(pwd)/.cache"
+mkdir -p .cache
+
 print_info "Generando cliente Prisma..."
-yarn prisma generate
+XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma generate
 
 print_info "Aplicando migraciones de base de datos..."
-yarn prisma migrate deploy
+XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma migrate deploy
 
 print_info "¿Deseas poblar la base de datos con datos iniciales de prueba?"
 print_warning "Esto creará usuarios de ejemplo (instructor@test.com y student@test.com)"
@@ -447,7 +453,7 @@ read -p "¿Ejecutar seed? (s/n) [s]: " RUN_SEED
 RUN_SEED=${RUN_SEED:-s}
 
 if [[ $RUN_SEED =~ ^[SsYy]$ ]]; then
-    yarn prisma db seed
+    XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma db seed
     print_message "Base de datos poblada con datos de prueba"
     echo ""
     print_info "Usuarios de prueba creados:"

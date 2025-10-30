@@ -42,6 +42,29 @@ sudo mv ~/contenedor_cursos /opt/
 sudo chown -R $USER:$USER /opt/contenedor_cursos
 ```
 
+### ⚙️ Configuración Especial para Prisma
+
+Cuando instalas en directorios con permisos restringidos, Prisma puede tener problemas al crear su caché. El script de instalación maneja esto automáticamente configurando:
+
+```bash
+export XDG_CACHE_HOME="$(pwd)/.cache"
+```
+
+**Si ejecutas comandos de Prisma manualmente después de la instalación**, usa este prefijo:
+
+```bash
+# Generar cliente Prisma
+XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma generate
+
+# Aplicar migraciones
+XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma migrate deploy
+
+# Ejecutar seed
+XDG_CACHE_HOME="$(pwd)/.cache" yarn prisma db seed
+```
+
+**Nota**: Este problema solo ocurre cuando el directorio `/home/usuario` no existe o no tiene permisos. El script de instalación lo resuelve automáticamente.
+
 ---
 
 ## 🚀 Instalación Rápida con Scripts Automáticos
