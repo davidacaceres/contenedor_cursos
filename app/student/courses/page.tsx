@@ -13,10 +13,10 @@ export default async function StudentCoursesPage() {
     redirect('/');
   }
 
-  // Obtener todos los cursos disponibles
+  // Obtener solo cursos publicados
   const courses = await prisma.course.findMany({
     where: {
-      isPublished: true,
+      status: 'PUBLISHED',
     },
     include: {
       instructor: {

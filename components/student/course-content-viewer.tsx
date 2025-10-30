@@ -8,8 +8,9 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { toast } from 'sonner';
-import { CheckCircle2, Circle, PlayCircle, FileText, Link as LinkIcon, FileQuestion, Clock } from 'lucide-react';
+import { CheckCircle2, Circle, PlayCircle, FileText, Link as LinkIcon, FileQuestion, Clock, MessageSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Module {
   id: string;
@@ -230,6 +231,14 @@ export function CourseContentViewer({ courseId }: { courseId: string }) {
             )}
           </CardHeader>
           <CardContent className="p-0">
+            <div className="p-4 border-b">
+              <Link href={`/courses/${courseId}/forum`}>
+                <Button variant="outline" className="w-full">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Foro de Discusión
+                </Button>
+              </Link>
+            </div>
             <Accordion type="single" collapsible className="w-full">
               {modules.map((module) => (
                 <AccordionItem key={module.id} value={module.id} className="border-b-0 px-4">
